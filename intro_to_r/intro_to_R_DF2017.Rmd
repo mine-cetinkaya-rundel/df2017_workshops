@@ -1,7 +1,7 @@
 ---
-title: "DataFest 2016 <br> Introduction to R and RStudio"
-author: "Gary Larson and Monika Hu"
-date: "March 23, 2016"
+title: "DataFest 2017 <br> Introduction to R and RStudio"
+author: "Olanrewaju Michael Akande"
+date: "March 21, 2017"
 output:
   ioslides_presentation:
     highlight: pygments
@@ -27,6 +27,11 @@ dim(arbuthnot)
 print('Hello!')
 ```
 -->
+
+## Acknowledgements
+
+<br>
+These slides were previously developed by Gary Larson and Monika Hu.
 
 ## Outline
 
@@ -108,20 +113,11 @@ Upper-left:
 
 - The `DFworkshop.csv` dataset used in this presentation is available at
 
-http://tinyurl.com/df15-introToR-data
-    
-- The **R script** containing all of the R code from this presentation can be found at 
+http://tinyurl.com/DF17IntroToR-Data
 
-http://tinyurl.com/df15-introToR-code
+- All other files (R script, source code, presentation, etc.) can be found at
 
-- The slides for this presentation can be found at
-
-http://tinyurl.com/df2016-introToR-slides or
-http://tinyurl.com/df16-introToR-slides
-
-- All other files (source code, etc.) can be found at
-
-http://tinyurl.com/df15-introToR-source
+http://tinyurl.com/DF17IntroToR
 
 ## Loading a large .csv dataset Method 1
 ### By point-and-click
@@ -147,8 +143,8 @@ Save the .csv file to a directory on your computer (e.g. your Dropbox). Then, to
 - execute `read.csv()` with the following arguments:
 
 ```{r loadCSV, eval = TRUE}
-myData = read.csv("DFworkshop.csv", comment.char = "", quote = "",
-                  stringsAsFactors = FALSE)
+myData = read.csv("~/Dropbox/DFworkshop.csv", comment.char = "",
+                   quote = "",stringsAsFactors = FALSE)
 ```
 
 - **TIP**: Write your commands in the **script** window so they're easily accessible.
@@ -180,6 +176,8 @@ install.packages("mosaic")  # "" mandatory
 library("mosaic")           # "" optional
 ```
 **IMPORTANT**: These two commands must **both** be used, or the package's functions won't be accessible to you.
+
+- You would learn about the most common and useful packages in the remaining workshops.
 
 # EDA </br> Summary statistics
 ## categorical variables
@@ -237,7 +235,7 @@ Get a quick summary using a contingency table with the **table** command.
 table(myData$type, myData$state)
 ```
 
-So, for example, the number of observations (rows of the dataset) with `type == 4` and `state == 'WA'` is 25.
+So, for example, the number of observations (rows of the dataset) with `type == 7` and `state == 'TX'` is 3.
 
 ## Comparing a continous variable across different groups
 ```{r boxplots, eval=FALSE}
@@ -258,7 +256,7 @@ boxplot(myData$var6 ~ myData$type, ylab = "Variable 6",
 # More on basic statistical functionality
 ## t-test for a difference between means
 ```{r tTest, eval=TRUE}
-t.test(var6 ~ group, data = myData)
+t.test(var6 ~ group, data = myData, na.rm = TRUE)
 ```
 The `na.rm = ...` argument ignores the NA values in the dataset. 
 
@@ -361,3 +359,4 @@ abline(regression.fit)
 2. R command summaries and cheat sheets are all over the internet: e.g. https://www.zoology.ubc.ca/~schluter/R/data/ is a good one.
 3. Of course, also ask a DataFest participant / helper!
 4. If all else fails, listen to your heart ... Google it.
+
