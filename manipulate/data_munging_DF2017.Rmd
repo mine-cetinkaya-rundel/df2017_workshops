@@ -34,7 +34,7 @@ install.packages("nycflights13")
 
 - The slides and all source files for this presentation can be found at
 
-    - http://bit.ly/df2016_munging
+    - https://git.io/vSe0W
 
 
 ## Welcome to the Hadleyverse
