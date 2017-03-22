@@ -366,12 +366,11 @@ flights %>%
 Which plane (check the tail number) flew out of each New York airport the most?
 ```{r}
 flights %>%
-  filter(origin=="EWR" | origin=="JFK" | origin=="LGA") %>%
+  filter((origin=="EWR" | origin=="JFK" | origin=="LGA") & !is.na(tailnum)) %>%
   group_by(origin,tailnum) %>%
   summarise(freq=n()) %>%
   group_by(origin) %>%
   arrange(desc(freq)) %>%
-  filter(!is.na(tailnum)) %>%
   slice(1)
 ```
 
