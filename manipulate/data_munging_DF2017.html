@@ -751,16 +751,16 @@ res = h(res, z=1)</pre>
 <pre >## # A tibble: 10 × 19
 ##     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time arr_delay carrier
 ##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;   &lt;chr&gt;
-## 1   2013    12    25     1629           1445       104     1925           1749        96      DL
-## 2   2013     4    19     2017           2000        17     2344           2138       126      UA
-## 3   2013     7    10     1135           1135         0     1356           1341        15      DL
-## 4   2013     7    26      858            845        13     1101           1044        17      US
-## 5   2013     1    10     1309           1300         9     1602           1606        -4      B6
-## 6   2013    12    19     2108           2100         8     2219           2214         5      US
-## 7   2013     9    25     1026           1030        -4     1348           1335        13      AA
-## 8   2013     4    10     1027           1030        -3     1250           1248         2      DL
-## 9   2013     2    20     1714           1720        -6     1914           1910         4      AA
-## 10  2013    12    19     2141           2116        25       12           2349        23      EV
+## 1   2013     3    29     1257           1300        -3     1519           1521        -2      EV
+## 2   2013     2    10     1445           1445         0     1730           1710        20      MQ
+## 3   2013    10    14     1817           1820        -3     2013           2034       -21      9E
+## 4   2013     7    12     1623           1624        -1     1845           1907       -22      UA
+## 5   2013    11     4      559            600        -1      833            827         6      DL
+## 6   2013     8     7     1700           1700         0     1836           1845        -9      MQ
+## 7   2013     1    14     1724           1730        -6     1933           1923        10      US
+## 8   2013     4     5      727            725         2     1001           1029       -28      UA
+## 9   2013     6     7     1438           1415        23     1606           1534        32      EV
+## 10  2013     7    19     1405           1259        66     1705           1555        70      B6
 ## # ... with 9 more variables: flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
 ## #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</pre>
 
@@ -771,16 +771,16 @@ res = h(res, z=1)</pre>
 <pre >## # A tibble: 337 × 19
 ##     year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time arr_delay carrier
 ##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;   &lt;chr&gt;
-## 1   2013     5    18      729            730        -1     1016           1105       -49      VX
-## 2   2013     1    17     1440           1440         0     1751           1746         5      UA
-## 3   2013     6    13     1957           1905        52     2337           2224        73      B6
-## 4   2013     6    19      622            630        -8      842            845        -3      DL
-## 5   2013    10     2     1641           1649        -8     1849           1903       -14      EV
-## 6   2013     9     2     1840           1830        10     2044           2105       -21      WN
-## 7   2013    12    25     1920           1930       -10     2102           2130       -28      MQ
-## 8   2013    10    25      739            740        -1      951            945         6      EV
-## 9   2013    12    28      555            600        -5      904            856         8      B6
-## 10  2013    12    28     2027           2030        -3     2320           2326        -6      UA
+## 1   2013    12    14     1708           1710        -2     2106           2047        19      B6
+## 2   2013     1     1     1354           1359        -5     1452           1514       -22      DL
+## 3   2013     7    10     1200           1155         5     1447           1454        -7      DL
+## 4   2013     7     4      615            611         4      952            954        -2      B6
+## 5   2013     6     1     1802           1759         3     2032           2049       -17      B6
+## 6   2013     2    22      703            702         1     1138           1158       -20      UA
+## 7   2013    10    18     1353           1359        -6     1647           1654        -7      AA
+## 8   2013     4    18     1046           1050        -4     1401           1400         1      DL
+## 9   2013     8    22      936            920        16     1226           1220         6      VX
+## 10  2013    11    27      850            850         0     1214           1228       -14      B6
 ## # ... with 327 more rows, and 9 more variables: flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;,
 ## #   dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</pre>
 
@@ -882,24 +882,21 @@ arrange(avg_arr_delay_by_dest,desc(avg_arr_delay))</pre>
 
 <pre class = 'prettyprint lang-r'>flights %&gt;%
   filter(origin==&quot;EWR&quot; | origin==&quot;JFK&quot; | origin==&quot;LGA&quot;) %&gt;%
-  group_by(tailnum) %&gt;%
+  group_by(origin,tailnum) %&gt;%
   summarise(freq=n()) %&gt;%
-  arrange(desc(freq))</pre>
+  group_by(origin) %&gt;%
+  arrange(desc(freq)) %&gt;%
+  filter(!is.na(tailnum)) %&gt;%
+  slice(1)</pre>
 
-<pre >## # A tibble: 4,044 × 2
-##    tailnum  freq
-##      &lt;chr&gt; &lt;int&gt;
-## 1     &lt;NA&gt;  2512
-## 2   N725MQ   575
-## 3   N722MQ   513
-## 4   N723MQ   507
-## 5   N711MQ   486
-## 6   N713MQ   483
-## 7   N258JB   427
-## 8   N298JB   407
-## 9   N353JB   404
-## 10  N351JB   402
-## # ... with 4,034 more rows</pre>
+<pre >## Source: local data frame [3 x 3]
+## Groups: origin [3]
+## 
+##   origin tailnum  freq
+##    &lt;chr&gt;   &lt;chr&gt; &lt;int&gt;
+## 1    EWR  N15980   314
+## 2    JFK  N328AA   393
+## 3    LGA  N725MQ   567</pre>
 
 </article></slide><slide class=''><hgroup><h2>Example 3</h2></hgroup><article  id="example-3" class="smaller">
 
