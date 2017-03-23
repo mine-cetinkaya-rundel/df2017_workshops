@@ -1,0 +1,501 @@
+---
+title: "Flexible graphics with ggplot2"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
+
+```{r}
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+suppressPackageStartupMessages(library(dplyr))
+```
+
+```{r}
+op <- options()
+options(repr.plot.width=4, repr.plot.height=3)
+```
+
+## A tutorial example using the `iris` data set
+
+```{r}
+head(iris, n = 3)
+```
+
+### `ggplot2` expects data in `tall` format
+
+```{r}
+df <- iris %>% gather(variable, value, -Species)
+head(df, n=3)
+```
+
+### Make plot
+
+```{r}
+g <- ggplot(df, aes(x=value, fill=Species)) +
+    geom_density(alpha=0.3) +
+    facet_grid(variable ~ ., scales = "free_y") +
+    labs(title="Iris Data Set", x="cm", y="", fill="Iris") +
+    theme(plot.title = element_text(hjust=0.5)) +
+    scale_fill_brewer("set1")
+g
+```
+
+### Save plot as PDF
+
+```{r}
+ggsave("iris_density.pdf", plot=g)
+```
+
+### Check saved image
+
+![Iris plot](./iris_density.pdf)
+
+## What just happened?
+
+There are several concepts that you need to understand how `ggplot` converts data into pictures.
+
+### Major concept
+
+- **data** refers to a *tidy* data frame with observations in rows and variables in columhs.
+- **geom** (geometric objects) refer to graphic elements that represent the data such as points, lines, patches etc 
+- **aes** (aesthetic attributes) are visual properties of geoms such as x,y-coordinates, line color
+
+The major concept is that `ggpllot` maps data values or summaries to aesthetic attributes.
+
+### Other concepts
+
+- **scales** control the mapping from values in the data space to values in the aesthetic space
+- **guides** provide an interpretation of visual properties in terms of the data space
+- **stats** transform data values prior to being mapped to an aetheitc (often implicit in the geom)
+- **labs** provide text labels
+- **grouping** and **facets** allow you to condition on a discrete variiable or factor either wihtin the same plot (group) or as mulitple sub-plots (facet)
+- **themes** general plot properties specifying the "look and feel" of the graphic
+
+Try to identify the above concepts in this `ggplot` construction:
+
+```R
+g <- ggplot(df, aes(x=value, fill=Species)) +
+    geom_density(alpha=0.3) +
+    facet_grid(variable ~ ., scales = "free_y") +
+    labs(title="Iris Data Set", x="cm", y="", fill="Iris") +
+    theme(plot.title = element_text(hjust=0.5)) +
+    scale_fill_brewer("set1")
+```
+
+### Geometric objects (geoms)
+
+```{r}
+g <- ggplot(df, aes(x=variable, y=value))
+```
+
+#### Scatter plot with jitter
+
+```{r}
+g + geom_jitter()
+```
+
+#### Box plot
+
+```{r}
+g + geom_boxplot()
+```
+
+#### Violin plot
+
+```{r}
+g + geom_violin()
+```
+
+#### Raster plot
+
+```{r}
+options(repr.plot.width=10, repr.plot.height=3)
+df[,"index"] = rep(1:150, 4)
+ggplot(df, aes(x=index, y=variable, fill=value)) +
+scale_fill_gradient(low="yellow", high="red") +
+geom_raster() 
+```
+
+### Aesthetic attributes (aes)
+
+#### Aesthetic mapping
+
+```{r}
+options(repr.plot.width=4, repr.plot.height=3)
+ggplot(df, aes(x=variable, y=value)) + geom_jitter()
+```
+
+```{r}
+ggplot(df, aes(x=variable, y=value, color=variable)) + 
+geom_jitter() + 
+guides(color=F)
+```
+
+#### Aesthetic setting
+
+```{r}
+ggplot(df, aes(x=variable, y=value)) + 
+geom_jitter(color="salmon", size=1)
+```
+
+### Scales
+
+#### Controlling coordinate mapping
+
+```{r}
+ggplot(iris, aes(x=Sepal.Length, y=Petal.Length, color=Species)) +
+geom_point(alpha=0.3)
+```
+
+```{r}
+ggplot(iris, aes(x=Sepal.Length, y=Petal.Length, color=Species)) +
+geom_point(alpha=0.3) +
+scale_y_log10(breaks = 1:7)
+```
+
+#### Controlling color mapping
+
+```{r}
+ggplot(df, aes(x=value, fill=Species)) +
+geom_density(alpha=0.3) +
+guides(fill=F) +
+scale_fill_brewer(type="seq", palette=2)
+```
+
+```{r}
+ggplot(df, aes(x=value, fill=Species)) +
+geom_density(alpha=0.3) +
+guides(fill=F)+ 
+scale_fill_manual(values=c("yellow", "orange", "red", "purple")) +
+scale_x_continuous(breaks = 0:8, limits = c(-1, 9))
+```
+
+### Color palettes in Brewer
+
+```{r}
+if (!suppressPackageStartupMessages(require("RColorBrewer"))) {
+install.packages("RColorBrewer")
+suppressPackageStartupMessages(library(RColorBrewer))
+}
+```
+
+#### Use a sequential palette when values can be arranged from low to high
+
+```{r}
+options(repr.plot.width=4, repr.plot.height=9)
+display.brewer.all(type="seq")
+```
+
+#### Use a divergent palette when you want to highlight extremes
+
+```{r}
+options(repr.plot.width=4, repr.plot.height=5)
+display.brewer.all(type="div")
+```
+
+#### Use a qualitative palette when you are displaying categorical values
+
+```{r}
+options(repr.plot.width=4, repr.plot.height=4)
+display.brewer.all(type="qual")
+```
+
+### Statistics (stat)
+
+#### Plotting a function
+
+```{r}
+ggplot(data.frame(x = c(0, 3)), aes(x=x)) +
+stat_function(fun = exp, geom = "line")
+```
+
+#### Regression
+
+```{r}
+ggplot(iris, aes(x=Sepal.Length, y=Petal.Length)) +
+geom_point(alpha=0.3) + 
+stat_smooth(method = loess, se = 0.9)
+```
+
+#### Plotting summaries
+
+```{r}
+df1 <- df %>% group_by(variable) %>% 
+       summarize(mean=mean(value), se=sd(value)/sqrt(n()))
+df1
+```
+
+```{r}
+ggplot(df1, aes(x=variable, y=mean, fill=variable)) +
+geom_bar(stat="identity") +
+geom_errorbar(aes(ymin=mean-se, ymax=mean+se, width=0.5)) +
+scale_fill_brewer(type="qual", palette = 3) +
+guides(fill=F)
+```
+
+#### If we don't want error bars, you can plot the means directly
+
+```{r}
+ggplot(df, aes(x=variable, y=value, fill=variable)) +
+geom_bar(stat="summary", fun.y="mean") + 
+scale_fill_brewer(type="qual", palette = 3) +
+guides(fill=F)
+```
+
+### Conditioning on factor variables
+
+#### Grouping
+
+```{r}
+ggplot(df, aes(x=variable, y=value, fill=Species)) +
+geom_bar(stat="summary", fun.y="mean") +
+guides(fill=F)
+```
+
+```{r}
+ggplot(df, aes(x=variable, y=value, fill=Species)) +
+geom_bar(stat="summary", fun.y="mean", position = "dodge") +
+guides(fill=F)
+```
+
+```{r}
+ggplot(iris, aes(x=Sepal.Length, y=Petal.Length, color=Species)) +
+geom_point(alpha=0.3) + 
+stat_smooth(method = loess, se = 0.9)
+```
+
+#### Faceting
+
+```{r}
+ggplot(iris, aes(x=Sepal.Length, y=Petal.Length, color=Species)) +
+geom_point(alpha=0.3) + 
+stat_smooth(method = loess, se = 0.9) +
+facet_grid(. ~ Species) +
+guides(color=F)
+```
+
+```{r}
+ggplot(iris, aes(x=Sepal.Length, y=Petal.Length, color=Species)) +
+geom_point(alpha=0.3) + 
+stat_smooth(method = loess, se = 0.9) +
+facet_grid(Species ~ .) +
+guides(color=F)
+```
+
+```{r}
+ggplot(iris, aes(x=Sepal.Length, y=Petal.Length, color=Species)) +
+geom_point(alpha=0.3) + 
+stat_smooth(method = lm, se = 0.9) +
+facet_wrap(~ Species, scales = "free") +
+guides(color=F)
+```
+
+```{r}
+ggplot(iris, aes(x=Sepal.Length, y=Petal.Length, color=Species)) +
+geom_point(alpha=0.3) + 
+stat_smooth(method = lm, se = 0.9) +
+facet_wrap(~ Species, nrow = 3, scales = "free") +
+guides(color=F)
+```
+
+### Controlling the appearance with labels, annotations and themes
+
+```{r}
+ggplot(df, aes(x=value, fill=Species)) +
+geom_density(alpha=0.3) +
+guides(fill=F)+ 
+theme_grey(base_size = 12, base_family = "Courier")
+```
+
+```{r}
+ggplot(df, aes(x=value, fill=Species)) +
+geom_density(alpha=0.3) +
+guides(fill=F)+ 
+theme_bw(base_size = 14, base_family = "Helvetica")
+```
+
+```{r}
+ggplot(df, aes(x=value, fill=Species)) +
+geom_density(alpha=0.3) +
+guides(fill=F) + 
+labs(title="Density plots", x="Measurememnt (cm)", y="Density") +
+annotate("text", parse=T, label="pi", x=6, y=0.22, size=8) +
+annotate("segment", x=5.5, xend=6.5, y=0.2, yend=0.2, 
+         arrow=arrow(ends="both", angle=90, length=unit(0.2, "cm"))) +
+theme_bw(base_size = 14, base_family = "Helvetica") +
+theme(axis.title = element_text(color="blue"),
+      panel.grid.minor = element_blank(),
+      panel.grid.major = element_blank())
+```
+
+## Gallery of interesting plots
+
+### Radial plots
+
+```{r}
+ggplot(df, aes(x=variable, y=value, color=Species, fill=Species)) +
+geom_jitter(alpha=0.3) +
+geom_bar(stat="summary", fun.y="mean", position="dodge", alpha=0.5) +
+guides(fill=F) +
+coord_polar()
+```
+
+### Time series data
+
+```{r}
+sales <- scan("http://robjhyndman.com/tsdldata/data/fancy.dat")
+sales.ts <- ts(sales, frequency=12, start=c(1987,1))
+sales.ts
+```
+
+```{r}
+suppressPackageStartupMessages(library(zoo))
+```
+
+```{r}
+df.sales <- data.frame(date=as.Date(as.Date(as.yearmon(time(sales.ts)))), 
+                       sales=as.matrix(sales.ts))
+head(df.sales)
+```
+
+```{r}
+ggplot(df.sales, aes(x=date, y=sales)) + 
+geom_area(fill="red", alpha=0.3) +
+geom_line()
+```
+
+### Maps
+
+```{r}
+if (!require("maps")) {
+install.packages("maps")
+suppressPackageStartupMessages(library(maps))
+}
+```
+
+```{r}
+states <- map_data("state")
+head(states)
+```
+
+```{r}
+income <- read.csv("./income.csv")
+income <- setNames(income, c("state", colnames(income)[-1]))
+income <- income %>% mutate(state = tolower(state))
+head(income)
+```
+
+```{r}
+options(repr.plot.width=7)
+
+ggplot(income, aes(map_id = state, fill=X2014)) +
+geom_map(map = states) +
+scale_fill_gradient(low="white", high="red") +
+expand_limits(x = states$long, y = states$lat) +
+labs(title="Median household income", fill="USD") +
+coord_quickmap() +
+theme(axis.title.x=element_blank(),
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank(),
+      axis.title.y=element_blank(),
+      axis.text.y=element_blank(),
+      axis.ticks.y=element_blank())
+```
+
+### Dendrograms
+
+```{r}
+if (!suppressPackageStartupMessages(require("dendextend"))) {
+install.packages("dendextend")
+suppressPackageStartupMessages(library(dendextend))
+}
+```
+
+```{r}
+d_iris <- dist(iris[, -5])
+hc_iris <- hclust(d_iris, method = "complete")
+dend <- as.dendrogram(hc_iris)
+dend <- color_branches(dend, k=3)
+labels(dend) <- rep(c('-','--', '---'), each = 50 )
+```
+
+```{r}
+options(repr.plot.width=4, repr.plot.height=8)
+plot(dend, horiz=T)
+```
+
+### Graphs
+
+```{r}
+if (!suppressPackageStartupMessages(require("igraph"))) {
+install.packages("igraph")
+suppressPackageStartupMessages(library(igraph))
+}
+```
+
+```{r}
+if (!suppressPackageStartupMessages(require("gcookbook"))) {
+install.packages("gcookbook")
+suppressPackageStartupMessages(library(gcookbook))
+}
+```
+
+```{r}
+head(madmen2)
+```
+
+```{r}
+g <- graph.data.frame(madmen2, directed = T)
+```
+
+```{r}
+pr <- page.rank(g)$vector
+wc <- cluster_walktrap(g)
+member <- membership(wc)
+layout <- layout.fruchterman.reingold(g)
+plot(g, vertex.color= member,
+     vertex.size=3 + 19*(pr-min(pr))/(max(pr)-min(pr)), 
+     layout=layout,  
+     vertex.label=V(g)$name,
+     vertex.label.cex = .6,
+     vertex.label.dist = 0.4, 
+     edge.arrow.size=.3)
+```
+
+### Correlation matrices
+
+In this case, it is simplest to use a specialized plotting package.
+
+```{r}
+iris.cor = cor(iris[,-5])
+iris.cor
+```
+
+```{r}
+if (!suppressPackageStartupMessages(require("corrplot"))) {
+install.packages("corrplot")
+suppressPackageStartupMessages(library(corrplot))
+}
+```
+
+```{r}
+options(repr.plot.width=7)
+corrplot(iris.cor, type="lower", tl.cex = 1)
+```
+
+## References
+
+### General
+
+- [Official API Reference](http://docs.ggplot2.org/current/)
+- [R Graphics Cookbook](http://www.cookbook-r.com/Graphs/)
+- `ggplot2` cheat sheet from RStudio
+
