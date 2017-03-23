@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(shiny)\n\nfluidPage(\n  numericInput(\"i\", \"Choose x column\", 1, 1, 4),\n  numericInput(\"j\", \"Choose y column\", 2, 1, 4),\n  plotOutput(\"scatter\")\n)\n",
+    "created" : 1490283620968.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2178240635",
+    "id" : "21BE913D",
+    "lastKnownWriteTime" : 1490284310,
+    "last_content_update" : 1490284310787,
+    "path" : "~/git-teach/df2017/shiny/07_aes_string/ui.R",
+    "project_path" : "07_aes_string/ui.R",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

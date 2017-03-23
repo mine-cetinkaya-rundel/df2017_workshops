@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(shiny)\n\nui <- fluidPage(\n  # Download a CSS file from https://bootswatch.com and put in www folder\n  theme = \"bootstrap.css\",\n  \n  titlePanel(\"title panel\"),\n  \n  sidebarLayout(\n    position = \"left\",\n    sidebarPanel(\"sidebar panel\"),\n    mainPanel(\"main panel\")\n  )\n)\n\nserver <- function(input, output) {}\n\nshinyApp(ui = ui, server = server)",
+    "created" : 1490284340736.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "275818157",
+    "id" : "2455E540",
+    "lastKnownWriteTime" : 1490284512,
+    "last_content_update" : 1490284512413,
+    "path" : "~/git-teach/df2017/shiny/css_demo/app.R",
+    "project_path" : "css_demo/app.R",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
