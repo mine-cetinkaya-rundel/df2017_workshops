@@ -1,5 +1,7 @@
 # Data Visualizaiton
 
+[Git repo for workshop](https://github.com/mine-cetinkaya-rundel/df2017_workshops.git)
+
 The goal is to **facilitate or communicate insight about our data**, such as patterns, trends and correlations that may be missed in tables of numbers. This works because we are very good at detecting patterns in visual data - more of the brain is devoted to processing informaiton from the eyes than from any other sensory organ.
 
 ## Reference: [Ten guidelines for effective data visualization in scientific publications](http://www.sciencedirect.com/science/article/pii/S1364815210003270)
