@@ -357,7 +357,10 @@ sales.ts
 ```
 
 ```{r}
+if (!require("zoo")) {
+install.packages("zoo")
 suppressPackageStartupMessages(library(zoo))
+}
 ```
 
 ```{r}
