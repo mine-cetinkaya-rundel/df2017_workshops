@@ -8,7 +8,8 @@ ui <- fluidPage(
   
   sidebarLayout(
     position = "left",
-    sidebarPanel("sidebar panel"),
+    sidebarPanel("sidebar panel", 
+                 img(src="duke.png", align="left")),
     mainPanel("main panel")
   )
 )
