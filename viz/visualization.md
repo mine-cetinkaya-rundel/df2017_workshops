@@ -40,3 +40,8 @@ The goal is to **facilitate or communicate insight about our data**, such as pat
 - Write code to render outputs in `server.R` - this is where `ggplot2` graphics are created
 - Write code to display outputs in `ui.R`
 - Style and add polish to the applicaiton by adding CSS or graphics
+
+## Next steps
+
+- Review the use of `ggplot2` and try out the exercises in this [tutorial](http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html)
+- Look at the `shiny` [gallery](https://shiny.rstudio.com/gallery/) in the "Start Simple" section. Try to reproduce the five applications without referring to the given code.
