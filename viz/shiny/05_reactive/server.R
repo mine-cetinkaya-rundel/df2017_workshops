@@ -9,7 +9,15 @@ server <- function(input, output) {
       n <- input $n
       data.frame(x=rnorm(n))
     })
+    
+    # invalidate later triggers an update at regular intervals
+    time <- reactive({
+      invalidateLater(1000)
+      Sys.time()
+    })
   
+    output$time <- renderPrint(time())
+    
     output$hist <- renderPlot({
     df <- data()
     g <- ggplot(df, aes(x=x)) + 
