@@ -1,11 +1,8 @@
 ---
-title: "R Notebook"
-output: html_notebook
----
-title: "hclust walkthrough answers"
+title: "cluster walkthrough "
 author: "Liz Lorenzi"
 date: "March 26, 2017"
-output: html_document
+output: pdf_document
 ---
 
 ## Clustering Example: Clustering countries by distances
@@ -21,32 +18,32 @@ rownames(theData) <- capitals
 
 ```
 
-#Exerecise 1: Calculate the Euclidean latitude/longitude distances between all pairs of capital cities
+###Exerecise 1: Calculate the Euclidean latitude/longitude distances between all pairs of capital cities
 
 ```{r }
 
 ```
 
-#Exercise 2: Use the obtained distances to produce the hierarchical clustering dendrogram object. Use all the default parameters. NOTE: By default the clusters will be merged together using the maximum possible distance between all pairs of their elements.
+###Exercise 2: Use the obtained distances to produce the hierarchical clustering dendrogram object. Use all the default parameters. NOTE: By default the clusters will be merged together using the maximum possible distance between all pairs of their elements.
 
 ```{r }
 
 ```
 
-#Exercise 3: Visualize the obtained hierarchical clustering dendrogram.
+###Exercise 3: Visualize the obtained hierarchical clustering dendrogram.
 
 ```{r}
 
 ```
 
-#Exercise 4: Hierarchical clustering procedure builds a hierarchy of clusters. One advantage of this method is that we can use the same dendrogram to obtain different numbers of groups. Cluster the European capitals into 3 groups.
+###Exercise 4: Hierarchical clustering procedure builds a hierarchy of clusters. One advantage of this method is that we can use the same dendrogram to obtain different numbers of groups. Cluster the European capitals into 3 groups.
 
 ```{r}
 
 ```
 
 
-#Exercise 5: Instead of specifying the wanted number of groups we can select the dendrogram height where the tree will be partitioned into groups. Since we used the maximum linkage function (default in exercise 2) this height has a useful interpretation – it ensures that all elements within one cluster are not more than the selected distance apart.
+###Exercise 5: Instead of specifying the wanted number of groups we can select the dendrogram height where the tree will be partitioned into groups. Since we used the maximum linkage function (default in exercise 2) this height has a useful interpretation – it ensures that all elements within one cluster are not more than the selected distance apart.
 a) Cluster the European capitals by cutting the tree at height=20.
 b) Plot the dendrogram and visualize the height at which the tree was cut into groups using a line.
 
@@ -56,13 +53,13 @@ b) Plot the dendrogram and visualize the height at which the tree was cut into g
 ```
 
 
-#Exercise 6: Find four clusters using k-means:
+###Exercise 6: Find four clusters using k-means:
 ```{r}
 
 
 ```
 
-#Exercise 7: Visualize the cluster solutions. Compare to hierarchical clustering solutions. Plot both on the same plot using color/point shape.
+###Exercise 7: Visualize the cluster solutions. Compare to hierarchical clustering solutions. Plot both on the same plot using color/point shape.
 
 ```{r}
 

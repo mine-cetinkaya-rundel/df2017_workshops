@@ -1,0 +1,70 @@
+---
+title: "PCA Exercises"
+author: "Liz Lorenzi"
+date: "March 29, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+###Exercise1:
+Unsupervised techniques are often used in the analysis of genomic data. We will use PCA and hierarchical clustering on the NCI60 cancer cell line microarray data, which consists of 6,830 gene expression measurements on 64 cancer cell lines.
+
+```{r}
+library(ISLR)
+nci.labs = NCI60$labs
+nci.data = NCI60$data
+```
+
+###Exercise2:
+Each cell line is labeled with a cancer type, but because we are performing unsupervised techniques, we ignore these labels. Look at the table of the cancer types (in nci.labs). Report some summary statistics about the data. 
+```{r }
+
+```
+
+###Exercise3:
+We first perform PCA. We need to be sure our data is centered and scaled, so denote that in the call.
+
+```{r}
+
+
+```
+
+
+###Exercise4:
+To visualize the data, plot the first few principal component score vectors. Plot the observations corresponding to a given cancer type in the same color, so that we can see to what extent the observations are similar to eachother. Use the following function to assign a color to each observation.
+
+```{r}
+Cols = function(vec){
+  cols=rainbow(length(unique(vec)))
+  return(cols[as.numeric(as.factor(vec))])
+}
+```
+
+
+###Exercise5:
+We next obtain a summary of the proportion of variance explained of the first few principal components using the summary() function of the prcomp object. Also try plot() around the pr.comp object and explain what you see.
+
+```{r}
+
+
+```
+
+
+
+###Exercise6:
+Next, we want to use a scree plot to plot the proportion of variance explained of each principal component.   (Hint: The pr.comp object returns the sdev (pr.out$sdev) that is the sd explained by each component. Take this, convert to variance, and find the proportion for each component. Also look at the cumulative variation explained using cumsum() ).
+```{r}
+
+```
+
+###Exercise7:
+Run hierarchical clustering on this data. Plot the dendrogram and label the nodes of the tree with the cancer labels. This allows us to see how well we recover the true cancer clusters. (Labels can be given to the plot(hcl,labels=) function with the labels argument).  
+
+```{r}
+
+```

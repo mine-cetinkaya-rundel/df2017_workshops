@@ -1,0 +1,86 @@
+---
+title: "PCA Exercises Answers"
+author: "Liz Lorenzi"
+date: "March 29, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#NCI60 Data Example.
+
+Unsupervised techniques are often used in the analysis of genomic data. We will use PCA and hierarchical clustering on the NCI60 cancer cell line microarray data, which consists of 6,830 gene expression measurements on 64 cancer cell lines.
+
+```{r}
+library(ISLR)
+nci.labs = NCI60$labs
+nci.data = NCI60$data
+```
+
+###Exercise2:
+Each cell line is labeled with a cancer type, but because we are performing unsupervised techniques, we ignore these labels. We, however, can use these labels in checking the accuracy of our methods.
+
+
+```{r }
+dim(nci.data)
+
+table(nci.labs) #cancer types for cell lines
+
+```
+
+###Exercise3:
+We first perform PCA. We need to be sure our data is centered and scaled, so denote that in the call.
+
+```{r}
+pr.out = prcomp(nci.data, scale=TRUE)
+
+```
+
+###Exercise4:
+To visualize the data, plot the first few principal component score vectors. We plot the observations corresponding to a given cancer type in the same color, so that we can see to what extent the observations are similar to eachother. Use the following function to assign a color to each observation.
+
+```{r}
+Cols = function(vec){
+  cols=rainbow(length(unique(vec)))
+  return(cols[as.numeric(as.factor(vec))])
+}
+```
+
+```{r}
+par(mfrow=c(1,2))
+plot(pr.out$x[,1:2], col=Cols(nci.labs), pch=19, xlab="Z1", ylab="Z2")
+plot(pr.out$x[,c(1,3)], col=Cols(nci.labs), pch=19, xlab="Z1", ylab="Z3")
+
+```
+###Exercise5:
+Next obtain a summary of the proportion of variance explained of the first few principal components using the summary() function of the prcomp object. Also plot the prcomp object to visualize the proportion of variance explained. 
+
+```{r}
+summary(pr.out)
+plot(pr.out)
+```
+###Exercise6:
+Next, we want to use a scree plot to plot the proportion of variance explained of each principal component. 
+
+```{r}
+pve = 100*pr.out$sdev^2/sum(pr.out$sdev^2)
+par(mfrow=c(1,2))
+plot(pve, type="o", ylab="PVE", xlab="Principal Component", col="blue")
+plot(cumsum(pve), type="o", ylab="Cumulative PVE", xlab="Principal Component", col="brown3")
+```
+
+
+###Exercise7:
+If you have more time, run hierarchical clustering on this data. Plot the dendrogram and label the nodes of the tree with the cancer labels. This allows us to see how well we recover the true cancer clusters. (Labels can be given to the plot(hcl,labels=) function with an argument).  
+
+```{r}
+hcl <- hclust(dist(nci.data))
+plot(hcl, labels=nci.labs, hang=-1)
+
+
+```
+
+Adapted from Lab 3 of Chapter 10 of Elements of Machine Learning by Hastie, Tibshirani, Friedman.
+
