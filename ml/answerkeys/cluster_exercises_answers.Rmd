@@ -18,7 +18,7 @@ rownames(theData) <- capitals
 
 ```
 
-#Exerecise 1: Calculate the Euclidean latitude/longitude distances between all pairs of capital cities
+#Exerecise 1: Calculate the Euclidean latitude/longitude distances between all pairs of capital cities. 
 
 ```{r }
 distances <- dist(theData)
@@ -36,8 +36,7 @@ dendo <- hclust(distances)
 plot(dendo)
 ```
 
-#Exercise 4: Hierarchical clustering procedure builds a hierarchy of clusters. One advantage of this method is that we can use the same dendrogram to obtain different numbers of groups. Cluster the European capitals into 3 groups.
-
+#Exercise 4: Hierarchical clustering procedure builds a hierarchy of clusters. One advantage of this method is that we can use the same dendrogram to obtain different numbers of groups. Cluster the European capitals into 3 groups. 
 ```{r}
 groups <- cutree(dendo, k=3)
 table(groups) #results in one singleton

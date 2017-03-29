@@ -18,7 +18,7 @@ rownames(theData) <- capitals
 
 ```
 
-###Exerecise 1: Calculate the Euclidean latitude/longitude distances between all pairs of capital cities
+###Exerecise 1: Calculate the Euclidean latitude/longitude distances between all pairs of capital cities.
 
 ```{r }
 
@@ -36,7 +36,8 @@ rownames(theData) <- capitals
 
 ```
 
-###Exercise 4: Hierarchical clustering procedure builds a hierarchy of clusters. One advantage of this method is that we can use the same dendrogram to obtain different numbers of groups. Cluster the European capitals into 3 groups.
+###Exercise 4: Hierarchical clustering procedure builds a hierarchy of clusters. One advantage of this method is that we can use the same dendrogram to obtain different numbers of groups. Cluster the European capitals into 3 groups. (Use function cutree() around the hclust object using k to denote number of clusters and h the height that you want the tree cut.)
+
 
 ```{r}
 
@@ -53,7 +54,7 @@ b) Plot the dendrogram and visualize the height at which the tree was cut into g
 ```
 
 
-###Exercise 6: Find four clusters using k-means:
+###Exercise 6: Find four clusters using k-means. Compare the clustering solutions to the hclust clustering solutions using table().
 ```{r}
 
 
