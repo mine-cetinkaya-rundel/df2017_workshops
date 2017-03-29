@@ -1,0 +1,72 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+title: "hclust walkthrough answers"
+author: "Liz Lorenzi"
+date: "March 26, 2017"
+output: html_document
+---
+
+## Clustering Example: Clustering countries by distances
+
+First, load the data. 
+```{r cars, message=FALSE}
+library(ggmap)
+```
+```{r, message=FALSE, warning=FALSE}
+capitals <- c("Albania, Tirana", "Andorra, Andorra la Vella", "Armenia, Yerevan", "Austria, Vienna", "Azerbaijan, Baku", "Belarus, Minsk", "Belgium, Brussels", "Bosnia and Herzegovina, Sarajevo", "Bulgaria, Sofia", "Croatia, Zagreb", "Cyprus, Nicosia", "Czech Republic, Prague", "Denmark, Copenhagen", "Estonia, Tallinn", "Finland, Helsinki", "France, Paris", "Germany, Berlin", "Greece, Athens", "Georgia, Tbilisi", "Hungary, Budapest", "Iceland, Reykjavik", "Italy, Rome", "Latvia, Riga", "Kazakhstan, Astana", "Liechtenstein, Vaduz", "Lithuania, Vilnius", "Luxembourg, Luxembourg", "Macedonia, Skopje", "Malta, Valletta", "Moldova, Chişinău", "Monaco, Monaco-Ville", "Montenegro, Podgorica", "Netherlands, Amsterdam", "Norway, Oslo", "Poland, Warsaw", "Portugal, Lisbon", "Republic of Ireland, Dublin", "Romania, Bucharest", "Russia, Moscow", "San Marino, San Marino", "Serbia, Belgrade", "Slovakia, Bratislava", "Slovenia, Ljubljana", "Spain, Madrid", "Sweden, Stockholm", "Switzerland, Bern", "Turkey, Ankara", "Ukraine, Kiev", "United Kingdom, London", "Vatican City, Vatican City")
+theData <- geocode(capitals)
+rownames(theData) <- capitals
+
+```
+
+#Exerecise 1: Calculate the Euclidean latitude/longitude distances between all pairs of capital cities
+
+```{r }
+
+```
+
+#Exercise 2: Use the obtained distances to produce the hierarchical clustering dendrogram object. Use all the default parameters. NOTE: By default the clusters will be merged together using the maximum possible distance between all pairs of their elements.
+
+```{r }
+
+```
+
+#Exercise 3: Visualize the obtained hierarchical clustering dendrogram.
+
+```{r}
+
+```
+
+#Exercise 4: Hierarchical clustering procedure builds a hierarchy of clusters. One advantage of this method is that we can use the same dendrogram to obtain different numbers of groups. Cluster the European capitals into 3 groups.
+
+```{r}
+
+```
+
+
+#Exercise 5: Instead of specifying the wanted number of groups we can select the dendrogram height where the tree will be partitioned into groups. Since we used the maximum linkage function (default in exercise 2) this height has a useful interpretation – it ensures that all elements within one cluster are not more than the selected distance apart.
+a) Cluster the European capitals by cutting the tree at height=20.
+b) Plot the dendrogram and visualize the height at which the tree was cut into groups using a line.
+
+
+```{r}
+
+```
+
+
+#Exercise 6: Find four clusters using k-means:
+```{r}
+
+
+```
+
+#Exercise 7: Visualize the cluster solutions. Compare to hierarchical clustering solutions. Plot both on the same plot using color/point shape.
+
+```{r}
+
+```
+
+Note: Exercises adapted from https://www.r-bloggers.com/hierarchical-clustering-exercises-beginner/---
+
