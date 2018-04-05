@@ -2,7 +2,9 @@
 title: "PCA Exercises"
 author: "Liz Lorenzi"
 date: "March 29, 2017"
-output: pdf_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}

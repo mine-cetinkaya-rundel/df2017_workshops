@@ -1,8 +1,10 @@
 ---
-title: "cluster walkthrough "
+title: 'cluster walkthrough '
 author: "Liz Lorenzi"
 date: "March 26, 2017"
-output: pdf_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ## Clustering Example: Clustering countries by distances
