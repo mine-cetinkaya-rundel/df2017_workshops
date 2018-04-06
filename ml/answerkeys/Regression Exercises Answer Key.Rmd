@@ -1,0 +1,365 @@
+---
+title: "Regression Exercises"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# install any packages that you don't have
+#install.packages("MASS")
+#install.packages("glmnet")
+#install.packages("randomForest")
+#install.packages("ggplot2")
+# install.packages("ISLR")
+```
+
+First, we need to load all of the r libraries that we'll be using:
+
+```{r, message=FALSE, warning=FALSE}
+# Load the libraries after installation
+library(MASS)
+library(glmnet)
+library(randomForest)
+library(ggplot2)
+library(ISLR)
+library(dplyr)
+```
+
+We'll be using a dataset on house values in the suburbs of Boston. The command below displays information about the dataset in the help panel.
+```{r}
+?Boston
+dim(Boston)
+```
+
+The dataset has 506 neighborhoods and 14 descriptor variables. Given that the number of observations (n = 506) is much higher than the number of predictors (p = 14), we're probably not too worried about overfitting. It's always useful to look at the first few observations and get a sense for the data:
+
+```{r}
+head(Boston)
+```
+
+The variable 'medv' is the response that we're interested in modelling, which is median house price in $1000's. It's important to recognize which variables are categorical - in this case, only 'chas', which is proximity to the Charles River.
+
+## Linear Regression
+
+Let's start off with linear regression to model the median home value. A first guess at the important predictor variables are the neighborhood crime rate, average number of rooms per house, and the proportion of industry in the neighborhood.
+
+```{r}
+# Fit a linear model with a few variables
+lm1 = lm(medv ~ crim + rm + indus, data=Boston)
+
+## This is the information that R provides about the linear model:
+names(lm1)
+
+# To access that information use the '$' operator plus the name:
+lm1$coefficients
+```
+
+
+It's easy to print out a general summary of the regression. You can see all of the coefficient estimates and significance levels.
+
+```{r}
+summary(lm1)
+```
+
+### Linear Regression - Questions and Exercises
+
+From the linear model 'lm1' fit above:
+
+1. What is the coefficient associated with 'Indus' or the level of industrialization?
+
+```{r}
+coef(lm1)[4]
+```
+
+
+2. How many of the variables are statistically significant?
+
+All of them - Look at summary(lm1), and all of the coefficients have *** next to them, indicating a p-value less than 0.001.
+
+3. What fraction of the variation in 'medv' is explained by this model (i.e. the r-squared value)?
+
+The R-squared is $0.5655$, so around $56.55\%$ of the variation in median home value is being explained by this model.
+
+Create a linear model 'lm2' that includes interaction terms between the predictor variables.
+
+```{r}
+lm2 = lm(medv ~ crim * rm * indus, data=Boston)
+```
+
+1. What is the coefficient value associated with ‘indus’?
+
+```{r}
+coef(lm2)[4]
+```
+
+
+2. How has it changed from the previous model?
+
+It has flipped sign - now that we're taking into account interactions between industrialization and the other variables, the effect of industrialization alone is actually a positive!
+
+More generally, when you add new predictors into a model, and they're correlated with the old predictors, then the effect of the old predictors can completely change.
+
+Create a linear model 'lm3' that includes all possible predictors, but no interactions.
+
+```{r}
+# Hint: Instead of typing out all of the variables, a shortcut is to use the formula: medv ~ .
+lm3 = lm(medv ~ ., data=Boston)
+```
+
+1. What fraction of the variation in ‘medv’ is explained by this model? Why is this higher than in model 1?
+
+```{r}
+summary(lm3)
+```
+
+
+The $R^2$ value is now $0.7406$, so $74.06\%$ of the variation in median home value is being explained. This is higher than before, because we have added new variables. In a linear model, the $R^2$ value will always increase when you add more explanatory variables.
+
+2. How many of the variables are considered statistically significant?
+
+Almost all of them! Only the age of the home and the level of industrialization are no longer statistically significant. Most of the variables in the Boston dataset are important for predicting home prices.
+
+## Shrinkage / Regularization
+
+Large datasets often involved 10's or 100's of predictor variables. When there are too many variables (p) and too few observations (n), then standard linear algorithms - and many machine learning techniques - will perform poorly in prediction. This is because the model is 'overfitting' to the data. It is finding patterns in the observations that are actually just noise. Shrinkage / Regularization techniques keep coefficients in models small, which helps reduce overfitting. It may also eliminate some variables from the model entirely by setting the coefficient to $0$.
+
+Lasso and Ridge regression are commonly used types of regularization for linear models. Lasso reduces overfitting and eliminates some variables from the model. Ridge only reduces overfitting. The R package we will use is 'glmnet'. In both techniques, the amount that the coefficients are shrunk is controlled by a parameter $\lambda$. We will explore how to find the optimal value for $\lambda$.
+
+```{r}
+# Putting the data into matrices instead of data frame, as required by glmnet
+# Note that including '-1' in the formula deletes the intercept
+# Need to delete the intercept term, glmnet automatically adds that in
+X = model.matrix(medv ~  . - 1, data=Boston) 
+Y = Boston$medv
+
+# Fit a lasso model using cross validation
+lasso = cv.glmnet(X, Y)
+
+# First plot to see the cross validated mean-squared error as a function of the shrinkage parameter
+plot(lasso)
+```
+
+The optimal value of $\lambda$ is the one that minimizes the mean square error, which is plotted above. The MSE is calculated by cross-validation - setting aside part of the data when fitting the model, and testing how well the model predicts the held-out observations. This is repeated 10 times, setting aside $\frac{1}{10}$ of the data each time. The optimal $\lambda$ value is given below.
+
+```{r}
+lasso$lambda.min
+```
+
+The coefficient values from the Lasso model. Compare these to model lm3.
+```{r}
+coef(lasso)
+```
+
+### Shrinkage - Questions and Exercises
+
+1. Which variables have been removed from the model?
+
+Indus, age, rad, and tax.
+
+2. Do these correspond to the statistically insignificant variables from the standard linear model lm3?
+
+Partially - Indus and age were statistically insignificant in lm3, so we're not surprised to see them removed. It looks like rad and tax were also removed, even though they were considered statistically significant in lm3.
+
+3. Find the fitted 'medv' values from the lasso model. Compare the first 2 fitted values to the first 2 observed medv values in the Boston data.
+
+```{r}
+# Hint: You can use the 'predict' function to get all of the fitted values
+?predict.cv.glmnet
+
+# Compare to:
+Boston$medv[1:2]
+
+fitted_values = predict(lasso, newx=X, s="lambda.min")
+
+fitted_values[1:2]
+```
+
+Based on the first two observations, it doesn't look like the model is doing a great job! But we need to look more generally to see if it's actually doing okay at modelling home price.
+
+4. Plot all of the fitted values versus the actual 'medv' observations. If you can, add in the straight y = x line to the plot, which represents a perfect model. Is the model doing a good job of modelling median home value? Where is it having difficulties?
+
+Here is some example code. The variable 'fitted_values' is what I have named the fitted values from lasso.
+
+```{r}
+# Option #1: standard plotting functions
+# plot(fitted_values, Boston$medv, pch='.', cex=4)
+
+# Option #2: ggplot, visually much more attractive
+plot_data = data.frame(Boston$medv, fitted_values)
+names(plot_data) = c("Observed", "Fitted")
+ggplot(plot_data, aes(x = Fitted, y = Observed)) + geom_point() + geom_abline(slope=1)
+```
+
+The good news from the graph above is that the model is doing a reasonably good job at understanding home values in Boston. Where it seems to be struggling is with high-end homes. Note that most of the homes with an 'observed' or real value of $\$500,000$ or more have a fitted value from the model that is much smaller. It seems that it's difficult for the model to capture the very top of the housing market.
+
+Challenge: Add the fitted values from the 'lm3' linear model to the plot in a different color. How different are these fitted values from those with lasso regression?
+
+```{r}
+lasso.fitted = fitted_values
+plot_data = data.frame(Boston$medv, lasso.fitted, lm3$fitted.values)
+names(plot_data) = c("Observed", "Lasso", "Linear")
+ggplot(plot_data, aes(x = Lasso, y = Observed, color="Lasso")) + geom_point() + geom_abline(slope=1) +
+  geom_point(aes(x = Linear, color="Linear"))
+```
+
+With the points right on top of each other, it's honestly hard to see much of a consistent difference! Clearly these models are giving fairly similar results.
+
+Extra challenge: Find the rMSE of the fitted values in the lasso and lm3 models. This is a common metric of accuracy. It's definition is:
+sqrt(mean((fitted - observed)^2))
+
+```{r}
+plot_data %>%
+  mutate(sqerror_lasso = (Observed - Lasso)^2, sqerror_linear = (Observed-Linear)^2) %>%
+  summarize("Lasso rMSE" = sqrt(mean(sqerror_lasso)), "Linear rMSE" = sqrt(mean(sqerror_linear)))
+  
+```
+They're almost exactly the same, although the linear model's rMSE is actually lower! This is unusually, typically lasso models perform better than standard linear regression. In general, adding regularization/shrinkage to models typically helps.
+
+## Random Forests
+
+Random Forests are an easy to implement, flexible, machine learning model. They are a combination of many individual regression (or classification) trees. They generally have strong predictive performance, especially on large datasets with many observations (n). However, unlike the linear models, they do not have interpretable parameters that directly show the effect of each predictive parameter. They are closer to being a 'black box', but they can provide a simple metric of a variable's importance. Here is how easy it is to fit a random forest in R:
+
+```{r, cache=TRUE}
+# Fit a random forest for median home value using all the predictors in the Boston data
+rf = randomForest(medv ~ ., data=Boston, importance=TRUE)
+```
+
+We can see how the mean squared error is reduced as more individual trees are added in to the Random Forest Model:
+
+```{r}
+# Plot the mean squared error as more trees are added to the model.
+plot(rf)
+```
+
+As before, we can plot the fitted values against the truth:
+
+```{r, cache=TRUE}
+plot_data = data.frame("medv" = Boston$medv, "RandomForest" = rf$predicted)
+ggplot(plot_data, aes(x = RandomForest, y = medv)) + geom_point() + geom_abline(slope=1)
+```
+
+
+### Random Forest Questions and Exercises:
+
+1. What are the most important variables?
+```{r}
+rf$importance
+```
+
+It looks like the the most important variables are lstat (Percent of population which is lower status) and rm (the average number of rooms per house).
+
+2. What is the root mean squared error for the random forest with all 500 trees? How does this compare to the standard and lasso linear models?
+
+```{r}
+sqrt(rf$mse[500])
+```
+The root mean squared error is only $3.16$, which is significantly lower than the rMSE for the linear and lasso models.
+
+3. In a single plot, combine fitted values from the Random Forest with the lasso and the standard linear model. Comment on which model visually seems best.
+
+Helpful code that you can modify is given here. You need to remove 'eval = FALSE' from the header for this section to knit.
+
+```{r, eval=TRUE}
+### If you're stuck on this task, then this code will help
+### Here is ggplot code: You may use it, but note:
+# lasso.fitted is my new name for the fitted values from the lasso model, you may need to change that name in your code.
+
+plot_data = data.frame(Boston$medv, lm3$fitted.values, lasso.fitted, rf$predicted)
+names(plot_data) = c("MedValue", "Standard.Linear", "Lasso", "Random.Forest")
+p = ggplot(plot_data, aes(y = MedValue))
+p + geom_point(aes(x = Lasso, color="Lasso"), alpha=.3) + 
+  geom_point(aes(x = Random.Forest, color="Random Forest"), alpha=.3) + 
+  geom_point(aes(x = Standard.Linear, color="Linear"), alpha=.3) + 
+  geom_abline(slope=1) + xlab("Fitted Value") + xlim(-5, 50) + ylim(-5, 50)
+```
+
+We already expect the Random Forest to be best based on the rMSE values. It's a little hard to tell what's going on in the huge clump of data near the middle home values, but you can see that at the top right of the graph, the random forest is doing a much better job of modelling the high end homes. This is because Random Forests are more flexible than linear models, so can handle more complex, and non-linear behavior in the response variable.
+
+
+## Logistic Regression and Generalized Linear Models
+
+Generalized Linear Models are used when the outcome is not a continuous number like home prices. The outcome may be a binary variable (success-failure, alive-dead, etc...) or integer counts (number of clicks on website). We'll be working with stock market data, and want to predict whether the market will go up or down based upon the changes during the previous 5 days. We can fit the models, but they won't do a great job at prediction (if they did, we would be rich).
+
+```{r}
+#Get the Smarket data of stock market returns
+head(Smarket)
+```
+
+We'll fit a logistic regression using all available predictors, and then check what information is available with the 'names' command.
+
+```{r}
+# Fit the Logistic Regression
+glm1 = glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, data=Smarket, family=binomial)
+
+# See the available information contained in this model
+names(glm1)
+```
+
+Next, we'll look at the summary of the coefficients. Note that none of them are statistically significant, which gives us a hint at the difficulty of the problem.
+
+```{r}
+summary(glm1)
+```
+
+Now let's consider making predictions, rather than just looking at the data that was used to fit the model. This is crucial if we want to get a sense of how well the model will perform on real future data. A model will always perform better on the data that was used to fit the model than truly new data! This concept is highly related to the cross validation we saw before in the lasso model, which was used to find the optimal value of the shrinkage parameter $\lambda$.
+
+We will start by splitting the data into training and test sets and fitting the model on the training data only:
+
+```{r}
+# Now let's separate the data into training and test datasets
+train = subset(Smarket, Year < 2005)
+test = subset(Smarket, Year == 2005)
+
+# And fit the model on the training data only
+glm2 = glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, data=train, family=binomial)
+```
+
+Now we can make predictions on the test set, and evaluate how effective the model is:
+
+```{r}
+# Create the predictions
+glm2.predict = predict(glm2, test, type="response")
+
+# Create a contingency table to evaluate the model's predictions
+table(ifelse(glm2.predict > 0.5, "Predicted Up", "Predicted Down"), test$Direction)
+```
+
+## Logistic Regression Questions and Exercises
+
+1. Using the contingency table from the predictions made by model 'glm2', what is the accuracy rate for predictions that the market will go up? And for the market going down? And overall?
+
+```{r}
+# Accuracy for the market going up
+44 / (34 + 44)
+
+# Accuracy for the market going down
+77 / (77 + 97)
+
+# Overall accuracy
+(44 + 77) / (77 + 97 + 34 + 44)
+```
+
+
+2. Using glm1, create a contingency table of the fitted (not predicted) values versus the truth, and evaluate the accuracy rate of these fitted values
+
+```{r}
+# Hint: use the 'table' function on the fitted values, along with the logical indicators '<' and '>'
+glm1.fitted = predict(glm1, type="response")
+
+table(ifelse(glm1.fitted > 0.5, "Fitted Up", "Fitted Down"), Smarket$Direction)
+```
+
+3. Compare the accuracy of the predicted values in glm2 to the accuracy of the null model - i.e. just always predicting that the market goes up.
+
+```{r}
+# Accuracy of the predicted values in glm2
+(44 + 77) / (77 + 97 + 34 + 44)
+
+# Accuracy of the null model - always predicting up
+sum(Smarket$Direction == "Up")/nrow(Smarket)
+```
+
+It looks like we would do a better job by just guessing that the market will always go up, than relying on the model's predictions!
+
+More generally, note that fitting a model won't help if we don't have information that's actually predictive of whether the stock market goes up or down.
